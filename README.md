@@ -134,9 +134,6 @@ Regular users can be created through the registration page.
 - Vedika: Rental Requests, Approve/Reject Requests, Mock Advance Payment, Rental Lifecycle, Extension Requests, Returns, Extra Charges, Overdue Handling
 - Vennela: Home Dashboard, Chat, Reviews and Ratings, Issue Reporting, Moderation, Admin Dashboard, Analytics
 
-Detailed ownership breakdown is available in:
-
-- `TEAM_OWNERSHIP.md`
 
 ## Build Verification
 
