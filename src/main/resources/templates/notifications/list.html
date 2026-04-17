@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section th:if="${successMessage}" class="banner banner-success" th:text="${successMessage}"></section>
+    <section th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></section>
+
+    <section class="hero">
+        <p class="eyebrow">Notifications</p>
+        <h1>Your Updates</h1>
+        <p class="hero-copy">Unread notifications: <strong th:text="${unreadCount}">0</strong></p>
+        <form th:action="@{/notifications/read-all}" method="post" class="inline-form">
+            <button type="submit" class="secondary-button">Mark All Read</button>
+        </form>
+    </section>
+
+    <section class="books-grid" th:if="${!#lists.isEmpty(notifications)}">
+        <article class="card book-card" th:each="notification : ${notifications}"
+                 th:classappend="${!notification.read} ? ' book-card-muted' : ''">
+            <p class="eyebrow" th:text="${notification.read ? 'READ' : 'UNREAD'}">UNREAD</p>
+            <h2>Platform Notification</h2>
+            <p class="hero-copy">
+                <span th:text="${notification.message}"></span><br>
+                <strong>Received:</strong> <span th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+            </p>
+        </article>
+    </section>
+
+    <section class="card empty-state" th:if="${#lists.isEmpty(notifications)}">
+        <h2>No Notifications Yet</h2>
+        <p class="hero-copy">Waitlist availability and system updates will appear here.</p>
+    </section>
+</main>
+</body>
+</html>
