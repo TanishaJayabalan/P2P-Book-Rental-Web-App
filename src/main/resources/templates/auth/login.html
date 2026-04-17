@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${null})}"></div>
+<main class="page-shell">
+    <section class="form-card">
+        <p class="eyebrow">Authentication</p>
+        <h1>Login</h1>
+        <p class="hero-copy">Access your account to manage listings and rentals.</p>
+
+        <div th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/login}" th:object="${loginForm}" method="post" class="stack-form">
+            <label>
+                Email
+                <input type="email" th:field="*{email}" placeholder="Enter your email">
+                <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            </label>
+
+            <label>
+                Password
+                <input type="password" th:field="*{password}" placeholder="Enter your password">
+                <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+            </label>
+
+            <button type="submit" class="primary-button">Login</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>
