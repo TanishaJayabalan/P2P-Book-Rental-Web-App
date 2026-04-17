@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waitlist | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section th:if="${successMessage}" class="banner banner-success" th:text="${successMessage}"></section>
+    <section th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></section>
+
+    <section class="hero">
+        <p class="eyebrow">Waitlist</p>
+        <h1>Books You Are Watching</h1>
+        <p class="hero-copy">Keep track of unavailable books you want to rent when they open up again.</p>
+    </section>
+
+    <section class="books-grid" th:if="${!#lists.isEmpty(entries)}">
+        <article class="card book-card" th:each="entry : ${entries}">
+            <p class="eyebrow">WAITLISTED</p>
+            <h2 th:text="${entry.book.title}">Book</h2>
+            <p class="hero-copy">
+                <strong>Author:</strong> <span th:text="${entry.book.author}"></span><br>
+                <strong>Owner:</strong> <span th:text="${entry.book.owner.name}"></span><br>
+                <strong>Current Status:</strong> <span th:text="${entry.book.status}"></span><br>
+                <strong>Expected Availability:</strong> <span th:text="${entry.book.availabilityEnd}"></span><br>
+                <strong>Added On:</strong> <span th:text="${#temporals.format(entry.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+            </p>
+            <div class="hero-actions" th:if="${entry.book.status.name() == 'AVAILABLE'}">
+                <a th:href="@{|/books/${entry.book.id}/request|}" class="primary-button">Request Now</a>
+            </div>
+        </article>
+    </section>
+
+    <section class="card empty-state" th:if="${#lists.isEmpty(entries)}">
+        <h2>No Waitlisted Books</h2>
+        <p class="hero-copy">When you join a waitlist for an unavailable book, it will appear here.</p>
+        <a th:href="@{/books}" class="primary-button">Browse Books</a>
+    </section>
+</main>
+</body>
+</html>
