@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Requests | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section th:if="${successMessage}" class="banner banner-success" th:text="${successMessage}"></section>
+    <section th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></section>
+
+    <section class="hero">
+        <p class="eyebrow">Rental Workflow</p>
+        <h1>My Rental Requests</h1>
+        <p class="hero-copy">Track your requests and complete the mock advance payment once a lender approves your booking.</p>
+    </section>
+
+    <section class="books-grid" th:if="${!#lists.isEmpty(requests)}">
+        <article class="card book-card" th:each="request : ${requests}">
+            <p class="eyebrow" th:text="${request.status}">PENDING</p>
+            <h2 th:text="${request.book.title}">Book</h2>
+            <p class="hero-copy">
+                <strong>Author:</strong> <span th:text="${request.book.author}"></span><br>
+                <strong>Lender:</strong> <span th:text="${request.book.owner.name}"></span><br>
+                <strong>Requested:</strong> <span th:text="${request.requestedFrom}"></span> to <span th:text="${request.requestedTo}"></span><br>
+                <strong>Created At:</strong> <span th:text="${#temporals.format(request.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+            </p>
+            <div th:if="${advancePayments.containsKey(request.id)}">
+                <p class="hero-copy">
+                    <strong>Advance Payment:</strong>
+                    Rs. <span th:text="${advancePayments.get(request.id).amount}"></span><br>
+                    <strong>Payment Status:</strong>
+                    <span th:text="${advancePayments.get(request.id).status}"></span>
+                </p>
+                <form th:if="${request.status.name() == 'APPROVED' && advancePayments.get(request.id).status.name() != 'SUCCESSFUL'}"
+                      th:action="@{|/payments/${advancePayments.get(request.id).id}/complete|}"
+                      method="post" class="inline-form">
+                    <button type="submit" class="primary-button">Pay Advance</button>
+                </form>
+                <span th:if="${advancePayments.get(request.id).status.name() == 'SUCCESSFUL'}" class="pill-muted">Rental Active</span>
+            </div>
+        </article>
+    </section>
+
+    <section class="card empty-state" th:if="${#lists.isEmpty(requests)}">
+        <h2>No Requests Yet</h2>
+        <p class="hero-copy">Browse books and submit your first rental request.</p>
+        <a th:href="@{/books}" class="primary-button">Browse Books</a>
+    </section>
+</main>
+</body>
+</html>

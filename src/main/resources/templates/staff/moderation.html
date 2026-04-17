@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderation | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section th:if="${successMessage}" class="banner banner-success" th:text="${successMessage}"></section>
+    <section th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></section>
+
+    <section class="hero">
+        <p class="eyebrow">Moderator Console</p>
+        <h1>Moderation Dashboard</h1>
+        <p class="hero-copy">Review reported issues and move them through the moderation workflow.</p>
+    </section>
+
+    <section class="grid">
+        <article class="card" th:each="entry : ${reportStats}">
+            <h2 th:text="${entry.key}">Metric</h2>
+            <p class="hero-copy"><strong th:text="${entry.value}">0</strong></p>
+        </article>
+    </section>
+
+    <section class="books-grid" th:if="${!#lists.isEmpty(reports)}">
+        <article class="card book-card" th:each="report : ${reports}">
+            <p class="eyebrow" th:text="${report.status}">OPEN</p>
+            <h2 th:text="${report.reportType}">Report Type</h2>
+            <p class="hero-copy">
+                <strong>Reported By:</strong> <span th:text="${report.reportedBy.name}"></span><br>
+                <strong>Description:</strong> <span th:text="${report.description}"></span><br>
+                <strong>Target User:</strong> <span th:text="${report.targetUser != null ? report.targetUser.name : 'General Report'}"></span>
+            </p>
+            <div class="hero-actions" th:if="${report.status.name() != 'RESOLVED'}">
+                <form th:action="@{|/moderation/reports/${report.id}/review|}" method="post" class="inline-form">
+                    <button type="submit" class="secondary-button">Mark Under Review</button>
+                </form>
+                <form th:action="@{|/moderation/reports/${report.id}/resolve|}" method="post" class="inline-form">
+                    <button type="submit" class="primary-button">Resolve</button>
+                </form>
+            </div>
+        </article>
+    </section>
+
+    <section class="card empty-state" th:if="${#lists.isEmpty(reports)}">
+        <h2>No Reports Yet</h2>
+        <p class="hero-copy">User-submitted reports will appear here.</p>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section class="hero">
+        <p class="eyebrow">Administrator Console</p>
+        <h1>Platform Overview</h1>
+        <p class="hero-copy">Track platform activity, report volume, and overall usage from a single admin dashboard.</p>
+    </section>
+
+    <section class="grid">
+        <article class="card" th:each="entry : ${stats}">
+            <h2 th:text="${entry.key}">Metric</h2>
+            <p class="hero-copy"><strong th:text="${entry.value}">0</strong></p>
+        </article>
+        <article class="card" th:each="entry : ${reportStats}">
+            <h2 th:text="${entry.key}">Report Metric</h2>
+            <p class="hero-copy"><strong th:text="${entry.value}">0</strong></p>
+        </article>
+        <article class="card" th:each="entry : ${analytics}">
+            <h2 th:text="${entry.key}">Analytics</h2>
+            <p class="hero-copy"><strong th:text="${entry.value}">0</strong></p>
+        </article>
+    </section>
+
+    <section class="section-block">
+        <div class="section-heading">
+            <h2>Recent Reports</h2>
+            <p class="hero-copy">This gives administrators a quick audit view of moderation activity.</p>
+        </div>
+
+        <section class="books-grid" th:if="${!#lists.isEmpty(reports)}">
+            <article class="card book-card" th:each="report : ${reports}">
+                <p class="eyebrow" th:text="${report.status}">STATUS</p>
+                <h2 th:text="${report.reportType}">Report Type</h2>
+                <p class="hero-copy">
+                    <strong>Reported By:</strong> <span th:text="${report.reportedBy.name}"></span><br>
+                    <strong>Description:</strong> <span th:text="${report.description}"></span>
+                </p>
+            </article>
+        </section>
+
+        <section class="card empty-state" th:if="${#lists.isEmpty(reports)}">
+            <h2>No Reports Yet</h2>
+            <p class="hero-copy">Once users submit reports, they will appear here.</p>
+        </section>
+    </section>
+</main>
+</body>
+</html>

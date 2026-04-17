@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incoming Requests | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section th:if="${successMessage}" class="banner banner-success" th:text="${successMessage}"></section>
+    <section th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></section>
+
+    <section class="hero">
+        <p class="eyebrow">Lender Dashboard</p>
+        <h1>Incoming Rental Requests</h1>
+        <p class="hero-copy">Review requests for the books you listed. Approved requests now wait for the renter to complete a mock advance payment.</p>
+    </section>
+
+    <section class="books-grid" th:if="${!#lists.isEmpty(requests)}">
+        <article class="card book-card" th:each="request : ${requests}">
+            <p class="eyebrow" th:text="${request.status}">PENDING</p>
+            <h2 th:text="${request.book.title}">Book</h2>
+            <p class="hero-copy">
+                <strong>Requester:</strong> <span th:text="${request.renter.name}"></span><br>
+                <strong>Email:</strong> <span th:text="${request.renter.email}"></span><br>
+                <strong>Author:</strong> <span th:text="${request.book.author}"></span><br>
+                <strong>Requested:</strong> <span th:text="${request.requestedFrom}"></span> to <span th:text="${request.requestedTo}"></span><br>
+                <strong>Submitted:</strong> <span th:text="${#temporals.format(request.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+            </p>
+            <p class="hero-copy" th:if="${request.status.name() == 'APPROVED'}">
+                Waiting for the renter to complete the mock advance payment.
+            </p>
+
+            <div class="hero-actions" th:if="${request.status.name() == 'PENDING'}">
+                <form th:action="@{|/requests/${request.id}/approve|}" method="post" class="inline-form">
+                    <button type="submit" class="primary-button">Approve</button>
+                </form>
+                <form th:action="@{|/requests/${request.id}/reject|}" method="post" class="inline-form">
+                    <button type="submit" class="secondary-button">Reject</button>
+                </form>
+            </div>
+        </article>
+    </section>
+
+    <section class="card empty-state" th:if="${#lists.isEmpty(requests)}">
+        <h2>No Incoming Requests</h2>
+        <p class="hero-copy">Once another user requests one of your books, it will appear here.</p>
+        <a th:href="@{/books/new}" class="primary-button">List Another Book</a>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Rental | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section class="grid profile-grid">
+        <article class="card">
+            <p class="eyebrow">Selected Book</p>
+            <h1 th:text="${book.title}">Book Title</h1>
+            <p class="hero-copy">
+                <strong>Author:</strong> <span th:text="${book.author}"></span><br>
+                <strong>Genre:</strong> <span th:text="${book.genre}"></span><br>
+                <strong>Condition:</strong> <span th:text="${book.conditionDescription}"></span><br>
+                <strong>Price:</strong> Rs. <span th:text="${book.rentalPrice}"></span><br>
+                <strong>Available:</strong> <span th:text="${book.availabilityStart}"></span> to <span th:text="${book.availabilityEnd}"></span><br>
+                <strong>Lender:</strong> <span th:text="${book.owner.name}"></span>
+            </p>
+        </article>
+
+        <article class="form-card">
+            <p class="eyebrow">Rental Request</p>
+            <h2>Choose Rental Dates</h2>
+            <div th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></div>
+
+            <form th:action="@{|/books/${book.id}/request|}" th:object="${rentalRequestForm}" method="post" class="stack-form">
+                <div class="date-grid">
+                    <label>
+                        Requested From
+                        <input type="date" th:field="*{requestedFrom}">
+                        <span class="field-error" th:if="${#fields.hasErrors('requestedFrom')}" th:errors="*{requestedFrom}"></span>
+                    </label>
+
+                    <label>
+                        Requested To
+                        <input type="date" th:field="*{requestedTo}">
+                        <span class="field-error" th:if="${#fields.hasErrors('requestedTo')}" th:errors="*{requestedTo}"></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="primary-button">Submit Request</button>
+            </form>
+        </article>
+    </section>
+</main>
+</body>
+</html>

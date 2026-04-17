@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Issue | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section class="hero">
+        <p class="eyebrow">Safety and Moderation</p>
+        <h1>Report an Issue</h1>
+        <p class="hero-copy">Submit a report for inappropriate behavior, damaged books, payment concerns, or other policy violations.</p>
+    </section>
+
+    <section class="form-card">
+        <form th:action="@{/reports}" th:object="${reportForm}" method="post" class="stack-form">
+            <label>
+                Report Type
+                <input type="text" th:field="*{reportType}" placeholder="Example: Damaged Book / Abuse / Payment Issue">
+                <span class="field-error" th:if="${#fields.hasErrors('reportType')}" th:errors="*{reportType}"></span>
+            </label>
+
+            <label>
+                Description
+                <input type="text" th:field="*{description}" placeholder="Briefly describe the issue">
+                <span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+            </label>
+
+            <button type="submit" class="primary-button">Submit Report</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

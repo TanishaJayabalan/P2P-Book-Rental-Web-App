@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Rentals | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section th:if="${successMessage}" class="banner banner-success" th:text="${successMessage}"></section>
+    <section th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></section>
+
+    <section class="hero">
+        <p class="eyebrow">Rental Dashboard</p>
+        <h1>Borrowed and Lent Books</h1>
+        <p class="hero-copy">Manage the full rental lifecycle here: active rentals, returns, outstanding charges, and reviews after completion.</p>
+    </section>
+
+    <section class="section-block">
+        <div class="section-heading">
+            <h2>Borrowed By You</h2>
+            <p class="hero-copy">These are the books you rented from other users.</p>
+        </div>
+
+        <section class="books-grid" th:if="${!#lists.isEmpty(borrowedRentals)}">
+            <article class="card book-card" th:each="rental : ${borrowedRentals}">
+                <p class="eyebrow" th:text="${rental.status}">STATUS</p>
+                <h2 th:text="${rental.book.title}">Book</h2>
+                <p class="hero-copy">
+                    <strong>Lender:</strong> <span th:text="${rental.lender.name}"></span><br>
+                    <strong>Dates:</strong> <span th:text="${rental.startDate}"></span> to <span th:text="${rental.dueDate}"></span><br>
+                    <strong>Extra Charges:</strong> Rs. <span th:text="${rental.extraCharges}"></span><br>
+                    <strong>Returned On:</strong> <span th:text="${rental.returnDate != null ? rental.returnDate : 'Not returned yet'}"></span>
+                </p>
+
+                <div class="hero-actions" th:if="${rental.status.name() == 'ACTIVE' || rental.status.name() == 'EXTENDED'}">
+                    <form th:action="@{|/rentals/${rental.id}/return-request|}" method="post" class="inline-form">
+                        <button type="submit" class="primary-button">Request Return</button>
+                    </form>
+                    <a th:href="@{|/rentals/${rental.id}/chat|}" class="secondary-button">Open Chat</a>
+                </div>
+
+                <div class="form-card compact-form" th:if="${rental.status.name() == 'ACTIVE' || rental.status.name() == 'EXTENDED'}">
+                    <p class="eyebrow">Request Extension</p>
+                    <form th:action="@{|/rentals/${rental.id}/request-extension|}" method="post" class="stack-form">
+                        <label>
+                            Requested New Due Date
+                            <input type="date" name="requestedDueDate" th:value="${rental.dueDate.plusDays(2)}">
+                        </label>
+                        <button type="submit" class="secondary-button">Request Extension</button>
+                    </form>
+                </div>
+
+                <div class="card compact-form" th:if="${rental.status.name() == 'EXTENSION_REQUESTED'}">
+                    <p class="eyebrow">Extension Pending</p>
+                    <p class="hero-copy">
+                        <strong>Requested Due Date:</strong> <span th:text="${rental.requestedExtensionDueDate}"></span><br>
+                        Waiting for the lender to approve or reject this request.
+                    </p>
+                    <a th:href="@{|/rentals/${rental.id}/chat|}" class="secondary-button">Open Chat</a>
+                </div>
+
+                <div th:if="${rentalPayments.containsKey(rental.id)}">
+                    <p class="hero-copy">
+                        <strong>Payment:</strong> <span th:text="${rentalPayments.get(rental.id).type}"></span><br>
+                        <strong>Status:</strong> <span th:text="${rentalPayments.get(rental.id).status}"></span><br>
+                        <strong>Amount:</strong> Rs. <span th:text="${rentalPayments.get(rental.id).amount}"></span>
+                    </p>
+                    <form th:if="${rentalPayments.get(rental.id).type.name() == 'OUTSTANDING_CHARGE' && rentalPayments.get(rental.id).status.name() == 'PENDING'}"
+                          th:action="@{|/payments/${rentalPayments.get(rental.id).id}/settle-charge|}" method="post" class="inline-form">
+                        <button type="submit" class="primary-button">Pay Charges</button>
+                    </form>
+                </div>
+
+                <div class="form-card compact-form" th:if="${rental.status.name() == 'COMPLETED'}">
+                    <p class="eyebrow">Leave a Review</p>
+                    <form th:action="@{|/rentals/${rental.id}/review|}" method="post" class="stack-form">
+                        <label>
+                            Rating (1-5)
+                            <input type="number" name="rating" min="1" max="5" required>
+                        </label>
+                        <label>
+                            Comment
+                            <input type="text" name="comment" maxlength="255" placeholder="Share your experience">
+                        </label>
+                        <button type="submit" class="secondary-button">Review Lender</button>
+                    </form>
+                </div>
+            </article>
+        </section>
+
+        <section class="card empty-state" th:if="${#lists.isEmpty(borrowedRentals)}">
+            <h2>No Borrowed Rentals Yet</h2>
+            <p class="hero-copy">Once you complete advance payment for an approved request, your rental will appear here.</p>
+        </section>
+    </section>
+
+    <section class="section-block">
+        <div class="section-heading">
+            <h2>Lent By You</h2>
+            <p class="hero-copy">These are rentals for books you listed on the platform.</p>
+        </div>
+
+        <section class="books-grid" th:if="${!#lists.isEmpty(lentRentals)}">
+            <article class="card book-card" th:each="rental : ${lentRentals}">
+                <p class="eyebrow" th:text="${rental.status}">STATUS</p>
+                <h2 th:text="${rental.book.title}">Book</h2>
+                <p class="hero-copy">
+                    <strong>Renter:</strong> <span th:text="${rental.renter.name}"></span><br>
+                    <strong>Dates:</strong> <span th:text="${rental.startDate}"></span> to <span th:text="${rental.dueDate}"></span><br>
+                    <strong>Extra Charges:</strong> Rs. <span th:text="${rental.extraCharges}"></span><br>
+                    <strong>Returned On:</strong> <span th:text="${rental.returnDate != null ? rental.returnDate : 'Not returned yet'}"></span>
+                </p>
+
+                <div class="form-card compact-form"
+                     th:if="${rental.status.name() == 'RETURN_PENDING' || rental.status.name() == 'ACTIVE' || rental.status.name() == 'EXTENDED'}">
+                    <p class="eyebrow">Confirm Return</p>
+                    <form th:action="@{|/rentals/${rental.id}/confirm-return|}" method="post" class="stack-form">
+                        <label>
+                            Extra Charges (late fee or damage)
+                            <input type="number" name="extraCharges" min="0" step="0.01" value="0">
+                        </label>
+                        <button type="submit" class="primary-button">Confirm Return</button>
+                    </form>
+                </div>
+
+                <div class="card compact-form" th:if="${rental.status.name() == 'EXTENSION_REQUESTED'}">
+                    <p class="eyebrow">Extension Requested</p>
+                    <p class="hero-copy">
+                        <strong>Requested Due Date:</strong> <span th:text="${rental.requestedExtensionDueDate}"></span>
+                    </p>
+                    <div class="hero-actions">
+                        <form th:action="@{|/rentals/${rental.id}/approve-extension|}" method="post" class="inline-form">
+                            <button type="submit" class="primary-button">Approve Extension</button>
+                        </form>
+                        <form th:action="@{|/rentals/${rental.id}/reject-extension|}" method="post" class="inline-form">
+                            <button type="submit" class="secondary-button">Reject Extension</button>
+                        </form>
+                        <a th:href="@{|/rentals/${rental.id}/chat|}" class="secondary-button">Open Chat</a>
+                    </div>
+                </div>
+
+                <div class="hero-actions" th:if="${rental.status.name() == 'ACTIVE' || rental.status.name() == 'EXTENDED' || rental.status.name() == 'COMPLETED' || rental.status.name() == 'CHARGE_PENDING' || rental.status.name() == 'RETURN_PENDING'}">
+                    <a th:href="@{|/rentals/${rental.id}/chat|}" class="secondary-button">Open Chat</a>
+                </div>
+
+                <div class="form-card compact-form" th:if="${rental.status.name() == 'COMPLETED'}">
+                    <p class="eyebrow">Leave a Review</p>
+                    <form th:action="@{|/rentals/${rental.id}/review|}" method="post" class="stack-form">
+                        <label>
+                            Rating (1-5)
+                            <input type="number" name="rating" min="1" max="5" required>
+                        </label>
+                        <label>
+                            Comment
+                            <input type="text" name="comment" maxlength="255" placeholder="Share your experience">
+                        </label>
+                        <button type="submit" class="secondary-button">Review Renter</button>
+                    </form>
+                </div>
+            </article>
+        </section>
+
+        <section class="card empty-state" th:if="${#lists.isEmpty(lentRentals)}">
+            <h2>No Lent Rentals Yet</h2>
+            <p class="hero-copy">Approved requests that complete advance payment will appear here.</p>
+        </section>
+    </section>
+</main>
+</body>
+</html>
