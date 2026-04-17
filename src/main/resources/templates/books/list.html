@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Books | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section th:if="${successMessage}" class="banner banner-success" th:text="${successMessage}"></section>
+    <section th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></section>
+
+    <section class="hero">
+        <p class="eyebrow">Book Discovery</p>
+        <h1>Browse All Books</h1>
+        <p class="hero-copy">Search by title, author, or genre to find books on the platform. Unavailable books stay visible so renters know what is coming up next.</p>
+        <form th:action="@{/books}" method="get" class="search-form">
+            <input type="text" name="q" th:value="${searchQuery}" placeholder="Search by title, author, or genre">
+            <button type="submit" class="primary-button">Search</button>
+        </form>
+    </section>
+
+    <section class="books-grid" th:if="${!#lists.isEmpty(books)}">
+        <article class="card book-card" th:each="book : ${books}"
+                 th:classappend="${book.status.name() != 'AVAILABLE'} ? ' book-card-muted' : ''">
+            <p class="eyebrow" th:text="${book.genre}">Genre</p>
+            <h2 th:text="${book.title}">Book Title</h2>
+            <p class="hero-copy">
+                <strong>Status:</strong> <span th:text="${book.status}">AVAILABLE</span><br>
+                <strong>Author:</strong> <span th:text="${book.author}">Author</span><br>
+                <strong>Condition:</strong> <span th:text="${book.conditionDescription}">Condition</span><br>
+                <strong>Price:</strong> Rs. <span th:text="${book.rentalPrice}">0</span><br>
+                <strong>Availability:</strong>
+                <span th:text="${book.availabilityStart}">Start</span>
+                to
+                <span th:text="${book.availabilityEnd}">End</span><br>
+                <strong>Listed by:</strong> <span th:text="${book.owner.name}">Owner</span>
+            </p>
+            <p class="hero-copy" th:if="${book.status.name() == 'REQUESTED' || book.status.name() == 'RENTED' || book.status.name() == 'RETURN_PENDING'}">
+                <strong>Available after:</strong> <span th:text="${book.availabilityEnd}">End</span>
+            </p>
+            <div class="hero-actions">
+                <a th:if="${currentUser != null && currentUser.id != book.owner.id && book.status.name() == 'AVAILABLE'}"
+                   th:href="@{|/books/${book.id}/request|}" class="primary-button">Request Rental</a>
+                <span th:if="${currentUser != null && currentUser.id == book.owner.id}" class="pill-muted">Your Listing</span>
+                <span th:if="${currentUser == null && book.status.name() != 'AVAILABLE'}" class="pill-muted">Currently Unavailable</span>
+                <span th:if="${currentUser != null && currentUser.id != book.owner.id && book.status.name() != 'AVAILABLE'}" class="pill-muted">Currently Unavailable</span>
+                <form th:if="${currentUser != null && currentUser.id != book.owner.id && book.status.name() != 'AVAILABLE' && !waitlistedBookIds.contains(book.id)}"
+                      th:action="@{|/books/${book.id}/waitlist|}" method="post" class="inline-form">
+                    <button type="submit" class="secondary-button">Join Waitlist</button>
+                </form>
+                <span th:if="${currentUser != null && waitlistedBookIds.contains(book.id)}" class="pill-muted">On Your Waitlist</span>
+            </div>
+        </article>
+    </section>
+
+    <section class="card empty-state" th:if="${#lists.isEmpty(books)}">
+        <h2>No Books Found</h2>
+        <p class="hero-copy">Try a different search term or list the first book on the platform.</p>
+        <a th:if="${currentUser != null}" th:href="@{/books/new}" class="primary-button">List a Book</a>
+    </section>
+</main>
+</body>
+</html>
