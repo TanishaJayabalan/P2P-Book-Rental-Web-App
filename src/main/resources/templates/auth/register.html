@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${null})}"></div>
+<main class="page-shell">
+    <section class="form-card">
+        <p class="eyebrow">Authentication</p>
+        <h1>Create Your Account</h1>
+        <p class="hero-copy">Start lending and renting books in your local community.</p>
+
+        <div th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/register}" th:object="${registerForm}" method="post" class="stack-form">
+            <label>
+                Full Name
+                <input type="text" th:field="*{name}" placeholder="Enter your name">
+                <span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+            </label>
+
+            <label>
+                Email
+                <input type="email" th:field="*{email}" placeholder="Enter your email">
+                <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            </label>
+
+            <label>
+                Password
+                <input type="password" th:field="*{password}" placeholder="Create a password">
+                <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+            </label>
+
+            <label>
+                Location
+                <input type="text" th:field="*{location}" placeholder="City or area">
+            </label>
+
+            <button type="submit" class="primary-button">Register</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>
