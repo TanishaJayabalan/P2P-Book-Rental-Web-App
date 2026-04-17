@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | Book Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar(${currentUser})}"></div>
+<main class="page-shell">
+    <section th:if="${successMessage}" class="banner banner-success" th:text="${successMessage}"></section>
+    <section th:if="${errorMessage}" class="banner banner-error" th:text="${errorMessage}"></section>
+
+    <section class="grid profile-grid">
+        <article class="card">
+            <p class="eyebrow">My Account</p>
+            <h1 th:text="${currentUser.name}">User Name</h1>
+            <p class="hero-copy">
+                <strong>Email:</strong> <span th:text="${currentUser.email}"></span><br>
+                <strong>Role:</strong> <span th:text="${currentUser.role}"></span><br>
+                <strong>Location:</strong> <span th:text="${currentUser.location != null && !currentUser.location.isBlank() ? currentUser.location : 'Not set'}"></span><br>
+                <strong>Rating:</strong> <span th:text="${currentUser.ratingAverage}"></span>
+            </p>
+        </article>
+
+        <article class="form-card">
+            <p class="eyebrow">Profile</p>
+            <h2>Update Details</h2>
+
+            <form th:action="@{/profile}" th:object="${profileForm}" method="post" class="stack-form">
+                <label>
+                    Full Name
+                    <input type="text" th:field="*{name}" placeholder="Enter your name">
+                    <span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                </label>
+
+                <label>
+                    Email
+                    <input type="email" th:field="*{email}" placeholder="Enter your email">
+                    <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                </label>
+
+                <label>
+                    Location
+                    <input type="text" th:field="*{location}" placeholder="City or area">
+                </label>
+
+                <label>
+                    New Password
+                    <input type="password" th:field="*{password}" placeholder="Leave blank to keep current password">
+                    <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                </label>
+
+                <button type="submit" class="primary-button">Save Profile</button>
+            </form>
+        </article>
+    </section>
+
+    <section class="section-block">
+        <div class="section-heading">
+            <h2>Reviews You Have Received</h2>
+            <p class="hero-copy">These reviews are shown on your profile to help build trust on the platform.</p>
+        </div>
+
+        <section class="books-grid" th:if="${!#lists.isEmpty(receivedReviews)}">
+            <article class="card book-card" th:each="review : ${receivedReviews}">
+                <p class="eyebrow" th:text="|Rating: ${review.rating}/5|">Rating</p>
+                <h2 th:text="${review.reviewer.name}">Reviewer</h2>
+                <p class="hero-copy">
+                    <strong>Comment:</strong> <span th:text="${review.comment != null && !review.comment.isBlank() ? review.comment : 'No written feedback'}"></span><br>
+                    <strong>Transaction:</strong> <span th:text="${review.rentalTransaction.book.title}"></span>
+                </p>
+            </article>
+        </section>
+
+        <section class="card empty-state" th:if="${#lists.isEmpty(receivedReviews)}">
+            <h2>No Reviews Yet</h2>
+            <p class="hero-copy">Completed rentals and reviews from other users will appear here.</p>
+        </section>
+    </section>
+</main>
+</body>
+</html>
