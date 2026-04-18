@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="navbar(currentUser)" class="nav-shell">
+    <div class="nav-brand">
+        <a th:href="@{/}">Book Rental</a>
+    </div>
+    <nav class="nav-links">
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/books}">Browse Books</a>
+        <th:block th:if="${currentUser != null}">
+            <a th:href="@{/books/new}">List Book</a>
+            <a th:href="@{/my-requests}">My Requests</a>
+            <a th:href="@{/incoming-requests}">Incoming Requests</a>
+            <a th:href="@{/rentals}">My Rentals</a>
+            <a th:href="@{/waitlist}">Waitlist</a>
+            <a th:href="@{/notifications}">Notifications</a>
+            <a th:href="@{/reports/new}">Report Issue</a>
+            <a th:if="${currentUser.role.name() == 'MODERATOR' || currentUser.role.name() == 'ADMINISTRATOR'}" th:href="@{/moderation}">Moderation</a>
+            <a th:if="${currentUser.role.name() == 'ADMINISTRATOR'}" th:href="@{/admin}">Admin</a>
+            <a th:href="@{/profile}">Profile</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <button type="submit" class="link-button">Logout</button>
+            </form>
+        </th:block>
+        <th:block th:unless="${currentUser != null}">
+            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/register}" class="nav-cta">Register</a>
+        </th:block>
+    </nav>
+</header>
+</body>
+</html>
