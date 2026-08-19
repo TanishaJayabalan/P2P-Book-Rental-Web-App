@@ -30,33 +30,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### macOS ###
-.DS_Store
-**/.DS_Store
-
-### Maven local repository (never commit this) ###
-.m2/
-
-### H2 database runtime files ###
-data/*.mv.db
-data/*.trace.db
-*.mv.db
-*.trace.db
-
-### Compiled artifacts ###
-*.jar
-*.war
-*.ear
-
-### Logs ###
-*.log
-
-### Environment / Secrets (never commit) ###
-.env
-.env.*
-*.pem
-*.key
-*.p12
-*.jks
-*.keystore

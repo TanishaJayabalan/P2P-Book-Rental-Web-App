@@ -10,13 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DataInitializer {
 
-    /**
-     * Seeds default staff accounts for development/demo purposes.
-     *
-     * ⚠️  SECURITY NOTE: These are placeholder credentials for local development only.
-     *     Change these passwords before deploying to any production or public environment.
-     *     Ideally, inject them via environment variables or a secrets manager.
-     */
     @Bean
     CommandLineRunner seedStaffUsers(UserRepository userRepository) {
         return args -> {
